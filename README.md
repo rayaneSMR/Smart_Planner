@@ -1,16 +1,166 @@
-# smart_planner
+# 📅 Smart Planner
 
-A new Flutter project.
+Une application Flutter moderne de gestion de tâches avec calendrier intégré et notifications intelligentes.
 
-## Getting Started
+## ✨ Fonctionnalités
 
-This project is a starting point for a Flutter application.
+### 🎯 Gestion des Tâches
+- **CRUD complet** : Créer, lire, mettre à jour, supprimer des tâches
+- **Priorités** : 3 niveaux (Urgent, Modéré, Faible) avec codes couleur
+- **Stockage local** : Persistance des données avec Hive (base de données NoSQL)
+- **Interface moderne** : Design Material 3 avec thème clair/sombre automatique
 
-A few resources to get you started if this is your first Flutter project:
+### 📅 Calendrier Intégré
+- **Vue mensuelle** : Navigation fluide entre les mois
+- **Affichage des tâches** : Les tâches s'affichent directement sur leur date d'échéance
+- **Indicateurs visuels** : Jours avec tâches mis en évidence
+- **Navigation intuitive** : Passage entre vue liste et vue calendrier
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 🔔 Notifications Intelligentes
+- **Notification immédiate** : Alerte lors de la création d'une nouvelle tâche
+- **Rappels programmés** : 24h avant la deadline de chaque tâche
+- **Alerte deadline** : Notification exacte à l'heure d'échéance
+- **Support multi-plateforme** : Android et iOS avec permissions natives
+- **Gestion des fuseaux** : Support des fuseaux horaires automatiques
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 🎨 Design & UX
+- **Material 3** : Interface moderne suivant les dernières guidelines Google
+- **Thème adaptatif** : Detection automatique du thème système (clair/sombre)
+- **Animations fluides** : Transitions et micro-interactions soignées
+- **Responsive design** : Adaptation à toutes les tailles d'écran
+
+### 🛠️ Architecture Technique
+- **Clean Architecture** : Séparation claire des responsabilités
+- **State Management** : Gestion d'état locale avec StatefulWidget
+- **Services découplés** : NotificationService, TaskService isolés
+- **Widgets réutilisables** : Composants UI modulaires
+
+## 🚀 Démarrage Rapide
+
+### Prérequis
+- Flutter SDK 3.10.8+
+- Android 8.0+ / iOS 12.0+
+
+### Installation
+```bash
+git clone https://github.com/rayaneSMR/Smart_Planner.git
+cd Smart_Planner
+flutter pub get
+flutter run
+```
+
+## 📱 Captures d'Écran
+
+### Vue Liste des Tâches
+- Interface épurée avec cartes de tâches
+- Indicateurs de priorité par couleur
+- Bouton flottant d'ajout moderne
+
+### Vue Calendrier
+- Calendrier mensuel avec navigation
+- Intégration visuelle des échéances
+- Design Material 3 cohérent
+
+### Modal de Création
+- Bottom sheet moderne à 85% de hauteur
+- Sélection visuelle des priorités
+- Interface de sélection de dates intuitive
+
+## 🔧 Technologies Utilisées
+
+### Core
+- **Flutter 3.10.8** : Framework de développement cross-platform
+- **Dart** : Langage de programmation principal
+
+### Stockage & Persistance
+- **Hive 2.2.3** : Base de données NoSQL légère et rapide
+- **Hive Flutter 1.1.0** : Intégration Flutter pour Hive
+
+### Interface Utilisateur
+- **Material 3** : Système de design Google moderne
+- **Table Calendar 3.0.9** : Calendrier personnalisable et puissant
+
+### Notifications
+- **Flutter Local Notifications 20.0.0** : Notifications natives multi-plateforme
+- **Timezone 0.10.1** : Gestion des fuseaux horaires
+- **Flutter Native Timezone 1.0.0** : Detection automatique de la timezone locale
+
+### Développement
+- **VS Code** : Éditeur de code recommandé pour Flutter
+- **Git** : Contrôle de version et gestion du code source
+
+## 📋 Structure du Projet
+
+```
+lib/
+├── main.dart                 # Point d'entrée de l'application
+├── models/
+│   └── task.dart           # Modèle de données des tâches
+├── services/
+│   ├── notification_service.dart  # Gestion des notifications
+│   └── task_service.dart        # Opérations CRUD sur les tâches
+├── screens/
+│   └── home_screen.dart     # Écran principal avec navigation
+└── widgets/
+    ├── task_card.dart        # Carte individuelle de tâche
+    └── calendar_widget.dart   # Composant calendrier personnalisé
+```
+
+## 🎯 Fonctionnalités Clés
+
+### Cycle de Vie d'une Tâche
+1. **Création** → Notification immédiate + rappel 24h avant
+2. **Modification** → Mise à jour des rappels automatiquement
+3. **Suppression** → Annulation de toutes les notifications programmées
+
+### Système de Notifications
+- **3 canaux distincts** : Tâches, Deadlines, Deadline atteinte
+- **Gestion des permissions** : Demande automatique Android 13+
+- **Programmation robuste** : Survit aux redémarrages de l'appareil
+
+## 🔄 Évolutions Futures
+
+### Version 1.1 (En cours)
+- [ ] Synchronisation cloud multi-appareils
+- [ ] Partage de listes de tâches
+- [ ] Widgets personnalisables
+- [ ] Export/Import des données
+- [ ] Mode sombre amélioré
+
+## 📝 Notes de Développement
+
+### Architecture Respectée
+- **SOLID Principles** : Chaque service a une responsabilité unique
+- **Clean Code** : Séparation claire entre UI et logique métier
+- **Performance** : Utilisation de builders et const pour optimiser le rendu
+
+### Bonnes Pratiques
+- **Gestion d'erreurs** : Try-catch robuste dans les services
+- **Accessibilité** : Support des contrastes élevés et tailles de police
+- **Internationalisation** : Structure prête pour la traduction (français intégré)
+
+## 🤝 Contribution
+
+### Comment Contribuer
+1. **Forker** le projet
+2. **Créer une branche** : `git checkout -b feature/nouvelle-fonctionnalite`
+3. **Développer** en respectant le style de code existant
+4. **Tester** : `flutter test` et tests manuels sur émulateurs
+5. **Commiter** : Messages clairs et descriptifs
+6. **Pull Request** : Explication détaillée des changements
+
+### Convention de Code
+- **Dart Style** : Respect des conventions de nommage et formatage
+- **Flutter Widgets** : Utilisation de const et builders pour la performance
+- **Comments** : Code documenté pour la maintenance
+
+## 📄 Licence
+
+Ce projet est sous licence **MIT** - libre d'utilisation, modification et distribution.
+
+---
+
+**Développé avec ❤️ en Flutter**  
+**Architecturé pour évoluer** • **Conçu pour durer**
+
+*Pour toute question ou suggestion : [rayaneSMR](https://github.com/rayaneSMR)*
