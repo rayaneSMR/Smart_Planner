@@ -32,6 +32,11 @@ class NotificationService {
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
+    // Request exact alarm permission (Android 12+) so scheduled notifications fire when app is closed
+    await _plugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.requestExactAlarmsPermission();
   }
 
   Future<void> showNewTaskNotification(Task task) async {
@@ -82,7 +87,7 @@ class NotificationService {
       body: 'Votre tâche a une deadline dans 24h',
       scheduledDate: tzDate,
       notificationDetails: details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.alarmClock,
       matchDateTimeComponents: DateTimeComponents.dateAndTime,
     );
   }
@@ -115,7 +120,7 @@ class NotificationService {
       body: 'Votre tâche a atteint sa deadline',
       scheduledDate: tzDate,
       notificationDetails: details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.alarmClock,
       matchDateTimeComponents: DateTimeComponents.dateAndTime,
     );
   }
