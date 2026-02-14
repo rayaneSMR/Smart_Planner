@@ -87,8 +87,13 @@ class NotificationService {
     );
   }
 
-  Future<void> scheduleDeadlineReachedNotification(Task task) async {
-    if (task.deadline.isBefore(DateTime.now())) {
+  /// [showOverdueImmediately] when true and deadline is past, shows "overdue" notification now (e.g. on add/update). When false (e.g. on app start reschedule), skip to avoid spam.
+  Future<void> scheduleDeadlineReachedNotification(Task task, {bool showOverdueImmediately = true}) async {
+    final now = DateTime.now();
+    if (task.deadline.isBefore(now)) {
+      if (showOverdueImmediately) {
+        await _showDeadlineOverdueNotification(task);
+      }
       return;
     }
 
@@ -112,6 +117,24 @@ class NotificationService {
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.dateAndTime,
+    );
+  }
+
+  Future<void> _showDeadlineOverdueNotification(Task task) async {
+    const androidDetails = AndroidNotificationDetails(
+      'deadline_reached_channel',
+      'Deadline Reached',
+      channelDescription: 'Notifications when task deadlines are reached',
+      importance: Importance.max,
+      priority: Priority.max,
+    );
+    const iosDetails = DarwinNotificationDetails();
+    final details = NotificationDetails(android: androidDetails, iOS: iosDetails);
+    await _plugin.show(
+      id: task.hashCode ^ 0x200000,
+      title: 'Tâche en retard: ${task.title}',
+      body: 'La deadline de cette tâche est dépassée',
+      notificationDetails: details,
     );
   }
 

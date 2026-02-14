@@ -66,6 +66,14 @@ class TaskService {
     _loadFromBox();
   }
 
+  /// Re-schedule deadline and 24h notifications for all tasks (e.g. on app start).
+  Future<void> rescheduleAllNotifications() async {
+    for (final task in _tasks) {
+      await _notificationService.scheduleDeadlineNotification(task);
+      await _notificationService.scheduleDeadlineReachedNotification(task, showOverdueImmediately: false);
+    }
+  }
+
   Future<void> removeTask(Task task) async {
     // try to find matching entry in the box
     final idx = _box.values.toList().indexWhere((t) =>

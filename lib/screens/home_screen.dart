@@ -20,8 +20,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     // initialize TaskService
-    TaskService.create().then((s) {
-      setState(() {
+    TaskService.create().then((s) async {
+      await s.rescheduleAllNotifications();
+      if (mounted) setState(() {
         taskService = s;
       });
     });
