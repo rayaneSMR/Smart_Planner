@@ -57,8 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              colorScheme.primary.withValues(alpha: 0.1),
-              colorScheme.secondary.withValues(alpha: 0.1),
+              colorScheme.primary.withValues(alpha: 0.08),
+              colorScheme.secondary.withValues(alpha: 0.08),
             ],
           ),
         ),
@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               // Header
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -82,25 +82,27 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Icon(
                             Icons.task_alt,
                             color: colorScheme.onPrimary,
-                            size: 28,
+                            size: 26,
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 14),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Smart Planner',
-                                style: theme.textTheme.headlineMedium?.copyWith(
+                                style: theme.textTheme.headlineSmall?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: colorScheme.onSurface,
                                 ),
                               ),
+                              const SizedBox(height: 2),
                               Text(
-                                t('Organisez votre journée', 'Organize your day'),
-                                style: theme.textTheme.bodyMedium?.copyWith(
+                                t('Organisez votre journée en toute simplicité', 'Organize your day with ease'),
+                                style: theme.textTheme.bodySmall?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
+                                  fontSize: 12,
                                 ),
                               ),
                             ],
@@ -116,6 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             icon: Icon(
                               Icons.settings_outlined,
                               color: colorScheme.onSurfaceVariant,
+                              size: 22,
                             ),
                             tooltip: t('Paramètres', 'Settings'),
                             onPressed: () {
@@ -130,9 +133,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    // Navigation Tabs
+                    const SizedBox(height: 16),
+                    // Navigation Tabs (Full Width)
                     Container(
+                      width: double.infinity,
                       decoration: BoxDecoration(
                         color: colorScheme.surface,
                         borderRadius: BorderRadius.circular(16),
@@ -151,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               onTap: () => setState(() => _currentIndex = 0),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
+                                  vertical: 14,
                                 ),
                                 decoration: BoxDecoration(
                                   color: _currentIndex == 0
@@ -164,6 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     Icon(
                                       Icons.list,
+                                      size: 20,
                                       color: _currentIndex == 0
                                           ? colorScheme.onPrimary
                                           : colorScheme.onSurfaceVariant,
@@ -178,6 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontWeight: _currentIndex == 0
                                             ? FontWeight.bold
                                             : FontWeight.normal,
+                                        fontSize: 14,
                                       ),
                                     ),
                                   ],
@@ -190,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               onTap: () => setState(() => _currentIndex = 1),
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
+                                  vertical: 14,
                                 ),
                                 decoration: BoxDecoration(
                                   color: _currentIndex == 1
@@ -203,6 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     Icon(
                                       Icons.calendar_today,
+                                      size: 18,
                                       color: _currentIndex == 1
                                           ? colorScheme.onPrimary
                                           : colorScheme.onSurfaceVariant,
@@ -217,6 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         fontWeight: _currentIndex == 1
                                             ? FontWeight.bold
                                             : FontWeight.normal,
+                                        fontSize: 14,
                                       ),
                                     ),
                                   ],
@@ -230,24 +238,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-              // Content
+
+              // Body Content
               Expanded(
                 child: taskService == null
                     ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(
-                              color: colorScheme.primary,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              t('Chargement...', 'Loading...'),
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
+                        child: CircularProgressIndicator(
+                          color: colorScheme.primary,
                         ),
                       )
                     : _currentIndex == 0
@@ -261,23 +258,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      floatingActionButton: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: colorScheme.primary.withValues(alpha: 0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: FloatingActionButton.extended(
-          onPressed: _showAddTaskBottomSheet,
-          backgroundColor: colorScheme.primary,
-          foregroundColor: colorScheme.onPrimary,
-          icon: const Icon(Icons.add),
-          label: Text(t('Nouvelle tâche', 'New task')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showAddTaskBottomSheet,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        icon: const Icon(Icons.add),
+        label: Text(
+          t('Nouvelle tâche', 'New task'),
+          style: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -295,26 +283,19 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: colorScheme.surface,
+                color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: colorScheme.shadow.withValues(alpha: 0.08),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
               child: Icon(
-                Icons.inbox_outlined,
-                size: 64,
+                Icons.task_outlined,
+                size: 48,
                 color: colorScheme.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 16),
             Text(
-              t('Aucune tâche', 'No tasks'),
-              style: theme.textTheme.headlineSmall?.copyWith(
+              t('Aucune tâche pour le moment', 'No tasks yet'),
+              style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
               ),
@@ -322,8 +303,8 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             Text(
               t(
-                'Appuyez sur + pour ajouter votre première tâche',
-                'Tap + to add your first task',
+                'Appuyez sur le bouton + pour en créer une',
+                'Tap the + button to create one',
               ),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
@@ -334,21 +315,15 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: ListView.builder(
-        padding: const EdgeInsets.only(bottom: 100),
-        itemCount: tasks.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: TaskCard(
-              task: tasks[index],
-              onDelete: () => _confirmDelete(tasks[index]),
-            ),
-          );
-        },
-      ),
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 100),
+      itemCount: tasks.length,
+      itemBuilder: (context, index) {
+        return TaskCard(
+          task: tasks[index],
+          onDelete: () => _confirmDelete(tasks[index]),
+        );
+      },
     );
   }
 
@@ -368,7 +343,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: Colors.red.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(Icons.delete_outline, color: Colors.red[700]),
             ),
@@ -385,12 +360,6 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
             child: Text(
               t('Annuler', 'Cancel'),
               style: TextStyle(color: colorScheme.onSurfaceVariant),
@@ -401,7 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -428,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String title = '';
     DateTime startDate = DateTime.now();
     DateTime deadline = DateTime.now().add(const Duration(hours: 2));
-    int priority = 2; // 1=Urgent, 2=Moderate, 3=Low
+    int priority = 2;
 
     if (!mounted) return;
 
@@ -438,12 +407,15 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Container(
-          height: MediaQuery.of(context).size.height * 0.85,
           decoration: BoxDecoration(
             color: colorScheme.surface,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Handle
               Container(
@@ -457,59 +429,50 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               // Header
               Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Icon(
-                        Icons.add_task,
-                        color: colorScheme.primary,
-                        size: 24,
-                      ),
+                      child: Icon(Icons.add_task, color: colorScheme.primary),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Text(
-                        t('Nouvelle tâche', 'New task'),
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(
-                        Icons.close,
-                        color: colorScheme.onSurfaceVariant,
+                    const SizedBox(width: 12),
+                    Text(
+                      t('Nouvelle tâche', 'New task'),
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
               ),
+              const Divider(height: 1),
               // Form
-              Expanded(
+              Flexible(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Title field
+                      // Title input
                       Text(
-                        t('Titre', 'Title'),
-                        style: theme.textTheme.titleSmall?.copyWith(
+                        t('Titre de la tâche', 'Task title'),
+                        style: theme.textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 8),
                       TextField(
+                        autofocus: true,
                         decoration: InputDecoration(
-                          hintText: t('Entrez le titre de la tâche', 'Enter task title'),
+                          hintText: t(
+                            'Entrez le titre de votre tâche',
+                            'Enter your task title',
+                          ),
                           filled: true,
                           fillColor: colorScheme.surfaceContainerHighest.withValues(
                             alpha: 0.3,
@@ -518,152 +481,161 @@ class _HomeScreenState extends State<HomeScreen> {
                             borderRadius: BorderRadius.circular(16),
                             borderSide: BorderSide.none,
                           ),
-                          contentPadding: const EdgeInsets.all(16),
+                          prefixIcon: const Icon(Icons.edit_outlined),
                         ),
-                        onChanged: (value) => title = value,
+                        onChanged: (value) => setState(() => title = value),
                       ),
-                      const SizedBox(height: 24),
-
-                      // Dates section
-                      Text(
-                        t('Dates', 'Dates'),
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 20),
+                      // Dates row
                       Row(
                         children: [
+                          // Start Date
                           Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: colorScheme.surfaceContainerHighest.withValues(
-                                  alpha: 0.3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  t('Date de début', 'Start date'),
+                                  style: theme.textTheme.labelLarge?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    t('Début', 'Start'),
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  TextButton(
-                                    onPressed: () async {
-                                      final picked = await showDatePicker(
-                                        context: context,
-                                        initialDate: startDate,
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime(2100),
-                                      );
-                                      if (picked != null) {
-                                        setState(() {
-                                          startDate = DateTime(
-                                            picked.year,
-                                            picked.month,
-                                            picked.day,
-                                            startDate.hour,
-                                            startDate.minute,
+                                const SizedBox(height: 8),
+                                InkWell(
+                                  onTap: () async {
+                                    final picked = await showDatePicker(
+                                      context: context,
+                                      initialDate: startDate,
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2100),
+                                    );
+                                    if (picked != null) {
+                                      setState(() {
+                                        startDate = DateTime(
+                                          picked.year,
+                                          picked.month,
+                                          picked.day,
+                                          startDate.hour,
+                                          startDate.minute,
+                                        );
+                                        if (deadline.isBefore(startDate)) {
+                                          deadline = startDate.add(
+                                            const Duration(hours: 1),
                                           );
-                                          if (deadline.isBefore(startDate)) {
-                                            deadline = startDate.add(
-                                              const Duration(hours: 1),
-                                            );
-                                          }
-                                        });
-                                      }
-                                    },
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                    ),
-                                    child: Text(
-                                      startDate.toLocal().toString().split(' ')[0],
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        fontWeight: FontWeight.w500,
+                                        }
+                                      });
+                                    }
+                                  },
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.surfaceContainerHighest.withValues(
+                                        alpha: 0.3,
                                       ),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.calendar_today_outlined,
+                                          size: 18,
+                                          color: colorScheme.primary,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            startDate.toLocal().toString().split(' ')[0],
+                                            style: theme.textTheme.bodyMedium?.copyWith(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(width: 12),
+                          // Deadline
                           Expanded(
-                            child: Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: colorScheme.surfaceContainerHighest.withValues(
-                                  alpha: 0.3,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  t('Date limite', 'Deadline'),
+                                  style: theme.textTheme.labelLarge?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    t('Deadline', 'Deadline'),
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  TextButton(
-                                    onPressed: () async {
-                                      final picked = await showDatePicker(
+                                const SizedBox(height: 8),
+                                InkWell(
+                                  onTap: () async {
+                                    final picked = await showDatePicker(
+                                      context: context,
+                                      initialDate: deadline,
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2100),
+                                    );
+                                    if (picked != null) {
+                                      if (!context.mounted) return;
+                                      final pickedTime = await showTimePicker(
                                         context: context,
-                                        initialDate: deadline,
-                                        firstDate: DateTime(2000),
-                                        lastDate: DateTime(2100),
+                                        initialTime: TimeOfDay.fromDateTime(deadline),
                                       );
-                                      if (picked != null) {
-                                        if (!context.mounted) return;
-                                        final pickedTime = await showTimePicker(
-                                          context: context,
-                                          initialTime: TimeOfDay.fromDateTime(
-                                            deadline,
-                                          ),
+                                      setState(() {
+                                        deadline = DateTime(
+                                          picked.year,
+                                          picked.month,
+                                          picked.day,
+                                          pickedTime?.hour ?? deadline.hour,
+                                          pickedTime?.minute ?? deadline.minute,
                                         );
-                                        setState(() {
-                                          deadline = DateTime(
-                                            picked.year,
-                                            picked.month,
-                                            picked.day,
-                                            pickedTime?.hour ?? deadline.hour,
-                                            pickedTime?.minute ?? deadline.minute,
-                                          );
-                                        });
-                                      }
-                                    },
-                                    style: TextButton.styleFrom(
-                                      padding: EdgeInsets.zero,
-                                    ),
-                                    child: Text(
-                                      '${deadline.toLocal().toString().split(' ')[0]} ${TimeOfDay.fromDateTime(deadline.toLocal()).format(context)}',
-                                      style: theme.textTheme.bodyMedium?.copyWith(
-                                        fontWeight: FontWeight.w500,
+                                      });
+                                    }
+                                  },
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.surfaceContainerHighest.withValues(
+                                        alpha: 0.3,
                                       ),
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.access_time_rounded,
+                                          size: 18,
+                                          color: colorScheme.primary,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            '${deadline.toLocal().toString().split(' ')[0]} ${TimeOfDay.fromDateTime(deadline.toLocal()).format(context)}',
+                                            style: theme.textTheme.bodyMedium?.copyWith(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
-
-                      // Priority section
+                      const SizedBox(height: 20),
+                      // Priority selector
                       Text(
-                        t('Priorité', 'Priority'),
-                        style: theme.textTheme.titleSmall?.copyWith(
+                        t('Niveau de priorité', 'Priority level'),
+                        style: theme.textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w600,
-                          color: colorScheme.onSurface,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -673,7 +645,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: GestureDetector(
                               onTap: () => setState(() => priority = 1),
                               child: Container(
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: priority == 1
                                       ? Colors.red.withValues(alpha: 0.1)
@@ -710,12 +682,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: GestureDetector(
                               onTap: () => setState(() => priority = 2),
                               child: Container(
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: priority == 2
                                       ? Colors.orange.withValues(alpha: 0.1)
@@ -724,10 +696,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                   borderRadius: BorderRadius.circular(16),
                                   border: priority == 2
-                                      ? Border.all(
-                                          color: Colors.orange,
-                                          width: 2,
-                                        )
+                                      ? Border.all(color: Colors.orange, width: 2)
                                       : null,
                                 ),
                                 child: Column(
@@ -755,12 +724,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 8),
                           Expanded(
                             child: GestureDetector(
                               onTap: () => setState(() => priority = 3),
                               child: Container(
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: priority == 3
                                       ? Colors.green.withValues(alpha: 0.1)
@@ -769,10 +738,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                   borderRadius: BorderRadius.circular(16),
                                   border: priority == 3
-                                      ? Border.all(
-                                          color: Colors.green,
-                                          width: 2,
-                                        )
+                                      ? Border.all(color: Colors.green, width: 2)
                                       : null,
                                 ),
                                 child: Column(
@@ -802,14 +768,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
               ),
               // Bottom actions
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: colorScheme.surface,
                   border: Border(
@@ -824,9 +790,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: TextButton(
                         onPressed: () => Navigator.pop(context),
                         style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                         ),
                         child: Text(
@@ -858,9 +824,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colorScheme.primary,
                           foregroundColor: colorScheme.onPrimary,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(14),
                           ),
                           elevation: 0,
                         ),

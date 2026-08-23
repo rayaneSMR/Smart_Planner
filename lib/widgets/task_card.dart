@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../models/task.dart';
 import '../services/settings_service.dart';
 
@@ -6,24 +6,49 @@ class TaskCard extends StatelessWidget {
   final Task task;
   final VoidCallback onDelete;
 
-  const TaskCard({super.key, required this.task, required this.onDelete});
+  const TaskCard({
+    super.key,
+    required this.task,
+    required this.onDelete,
+  });
 
-  Color _priorityColor(int p) {
-    if (p == 1) return Colors.red;
-    if (p == 2) return Colors.orange;
-    return Colors.green;
+  Color _priorityColor(int priority) {
+    switch (priority) {
+      case 1:
+        return Colors.red;
+      case 2:
+        return Colors.orange;
+      case 3:
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
   }
 
-  String _priorityText(int p, bool isFr) {
-    if (p == 1) return isFr ? "Urgent" : "Urgent";
-    if (p == 2) return isFr ? "Modéré" : "Moderate";
-    return isFr ? "Faible" : "Low";
+  String _priorityText(int priority, bool isFr) {
+    switch (priority) {
+      case 1:
+        return isFr ? 'Urgent' : 'Urgent';
+      case 2:
+        return isFr ? 'Modéré' : 'Moderate';
+      case 3:
+        return isFr ? 'Faible' : 'Low';
+      default:
+        return isFr ? 'Normal' : 'Normal';
+    }
   }
 
-  IconData _priorityIcon(int p) {
-    if (p == 1) return Icons.priority_high;
-    if (p == 2) return Icons.schedule;
-    return Icons.low_priority;
+  IconData _priorityIcon(int priority) {
+    switch (priority) {
+      case 1:
+        return Icons.priority_high;
+      case 2:
+        return Icons.schedule;
+      case 3:
+        return Icons.low_priority;
+      default:
+        return Icons.help_outline;
+    }
   }
 
   bool _isOverdue() {
@@ -39,32 +64,25 @@ class TaskCard extends StatelessWidget {
     final isFr = SettingsService().isFrench;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
-        border: Border.all(
-          color: isOverdue
-              ? Colors.red.withValues(alpha: 0.3)
-              : colorScheme.outline.withValues(alpha: 0.1),
-          width: isOverdue ? 1.5 : 1,
-        ),
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(20),
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           onTap: () {},
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -72,11 +90,11 @@ class TaskCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Priority indicator
+                    // Priority indicator icon
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: priorityColor.withValues(alpha: 0.1),
+                        color: priorityColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
@@ -85,8 +103,8 @@ class TaskCard extends StatelessWidget {
                         size: 20,
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    // Title
+                    const SizedBox(width: 12),
+                    // Title and priority badge
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,23 +119,47 @@ class TaskCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const SizedBox(height: 4),
-                          // Priority badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: priorityColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              _priorityText(task.priority, isFr),
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: priorityColor,
-                                fontWeight: FontWeight.w600,
+                          // Priority badge & Overdue badge
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 4,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: priorityColor.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  _priorityText(task.priority, isFr),
+                                  style: theme.textTheme.labelSmall?.copyWith(
+                                    color: priorityColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
                               ),
-                            ),
+                              if (isOverdue)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    isFr ? 'En retard' : 'Overdue',
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: Colors.red[700],
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ],
                       ),
@@ -129,6 +171,8 @@ class TaskCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(
+                        constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                        padding: const EdgeInsets.all(6),
                         onPressed: onDelete,
                         icon: Icon(
                           Icons.delete_outline_rounded,
@@ -140,10 +184,10 @@ class TaskCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 // Date information
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(12),
@@ -152,7 +196,7 @@ class TaskCard extends StatelessWidget {
                     children: [
                       Icon(
                         Icons.calendar_today_outlined,
-                        size: 18,
+                        size: 16,
                         color: isOverdue
                             ? Colors.red[700]
                             : colorScheme.onSurfaceVariant,
@@ -166,6 +210,7 @@ class TaskCard extends StatelessWidget {
                               isFr ? 'Date limite' : 'Deadline',
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
+                                fontSize: 11,
                               ),
                             ),
                             Text(
@@ -177,39 +222,21 @@ class TaskCard extends StatelessWidget {
                                 fontWeight: isOverdue
                                     ? FontWeight.w600
                                     : FontWeight.w500,
+                                fontSize: 13,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      if (isOverdue) ...[
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.red.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            isFr ? 'En retard' : 'Overdue',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: Colors.red[700],
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
                     ],
                   ),
                 ),
                 // Start date (shown if different day from deadline)
                 if (task.startDate.toLocal().toString().split(' ')[0] !=
                     task.deadline.toLocal().toString().split(' ')[0]) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 6),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     decoration: BoxDecoration(
                       color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(12),
@@ -218,7 +245,7 @@ class TaskCard extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.play_circle_outline,
-                          size: 18,
+                          size: 16,
                           color: colorScheme.onSurfaceVariant,
                         ),
                         const SizedBox(width: 8),
@@ -229,6 +256,7 @@ class TaskCard extends StatelessWidget {
                               isFr ? 'Date de début' : 'Start date',
                               style: theme.textTheme.labelSmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
+                                fontSize: 11,
                               ),
                             ),
                             Text(
@@ -236,6 +264,7 @@ class TaskCard extends StatelessWidget {
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w500,
+                                fontSize: 13,
                               ),
                             ),
                           ],

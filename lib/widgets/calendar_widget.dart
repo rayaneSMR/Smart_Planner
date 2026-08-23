@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/task.dart';
 import '../services/settings_service.dart';
@@ -27,6 +27,12 @@ class _CalendarWidgetState extends State<CalendarWidget> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
+  @override
+  void initState() {
+    super.initState();
+    _selectedDay = _focusedDay;
+  }
+
   List<Task> _getTasksForDay(DateTime day) {
     return widget.tasks.where((task) {
       return task.deadline.year == day.year &&
@@ -40,13 +46,15 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isFr = SettingsService().isFrench;
-    final tasks = _selectedDay == null ? [] : _getTasksForDay(_selectedDay!);
+    final activeDay = _selectedDay ?? _focusedDay;
+    final dayTasks = _getTasksForDay(activeDay);
 
-    return Column(
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 100),
       children: [
+        // ── Calendar Card ──
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
@@ -63,6 +71,8 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             lastDay: DateTime.utc(2100),
             focusedDay: _focusedDay,
             locale: isFr ? 'fr_FR' : 'en_US',
+            rowHeight: 44,
+            daysOfWeekHeight: 22,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
@@ -95,17 +105,18 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 shape: BoxShape.circle,
               ),
               todayDecoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.1),
+                color: colorScheme.primary.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
-                border: Border.all(color: colorScheme.primary, width: 1),
+                border: Border.all(color: colorScheme.primary, width: 1.5),
               ),
             ),
             headerStyle: HeaderStyle(
               formatButtonVisible: false,
               titleCentered: true,
-              titleTextStyle: theme.textTheme.titleLarge?.copyWith(
+              titleTextStyle: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
                 color: colorScheme.onSurface,
+                fontSize: 16,
               ) ?? const TextStyle(),
               leftChevronIcon: Icon(
                 Icons.chevron_left,
@@ -128,106 +139,114 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             ),
             calendarBuilders: CalendarBuilders(
               defaultBuilder: (context, day, focusedDay) {
+                final tasks = _getTasksForDay(day);
+                final hasTasks = tasks.isNotEmpty;
                 return Container(
-                  margin: const EdgeInsets.all(4),
+                  margin: const EdgeInsets.all(3),
                   alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    color: Colors.transparent,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    '${day.day}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                    ) ?? const TextStyle(),
-                  ),
-                );
-              },
-              selectedBuilder: (context, day, focusedDay) {
-                return Container(
-                  margin: const EdgeInsets.all(4),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Text(
-                    '${day.day}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ) ?? const TextStyle(),
-                  ),
-                );
-              },
-              todayBuilder: (context, day, focusedDay) {
-                return Container(
-                  margin: const EdgeInsets.all(4),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: colorScheme.primary, width: 1),
-                  ),
-                  child: Text(
-                    '${day.day}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ) ?? const TextStyle(),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '${day.day}',
+                        style: TextStyle(
+                          color: hasTasks ? colorScheme.primary : colorScheme.onSurface,
+                          fontWeight: hasTasks ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 13,
+                        ),
+                      ),
+                      if (hasTasks)
+                        Container(
+                          margin: const EdgeInsets.only(top: 2),
+                          width: 4,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: colorScheme.primary,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ],
                   ),
                 );
               },
             ),
           ),
         ),
-        const SizedBox(height: 8),
-        Expanded(
-          child: tasks.isEmpty
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.event_busy_outlined,
-                          size: 48,
-                          color: colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        isFr ? "Aucune tâche pour ce jour" : "No tasks for this day",
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
-                        ) ?? const TextStyle(),
-                      ),
-                    ],
-                  ),
-                )
-              : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 100),
-                    itemCount: tasks.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: TaskCard(
-                          task: tasks[index],
-                          onDelete: () => widget.onDelete(tasks[index]),
-                        ),
-                      );
-                    },
+
+        const SizedBox(height: 16),
+
+        // ── Day Summary Header ──
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${activeDay.toLocal().toString().split(' ')[0]} (${dayTasks.length})',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.onSurface,
+                ),
+              ),
+              if (dayTasks.isNotEmpty)
+                Text(
+                  isFr ? 'Tâches du jour' : 'Tasks for day',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: colorScheme.primary,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
+            ],
+          ),
         ),
+
+        const SizedBox(height: 8),
+
+        // ── Day Tasks List (Unified Scroll!) ──
+        if (dayTasks.isEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.all(28),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.event_busy_outlined,
+                    size: 36,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  isFr ? "Aucune tâche pour ce jour" : "No tasks for this day",
+                  style: TextStyle(
+                    color: colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          )
+        else
+          ...dayTasks.map(
+            (task) => TaskCard(
+              task: task,
+              onDelete: () => widget.onDelete(task),
+            ),
+          ),
       ],
     );
   }

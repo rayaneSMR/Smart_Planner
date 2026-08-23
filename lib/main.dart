@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/task.dart';
@@ -47,6 +47,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Smart Planner',
+      debugShowCheckedModeBanner: false,
       // ── Localisation ────────────────────────────────────────────────────
       locale: _settings.locale,
       supportedLocales: const [Locale('fr'), Locale('en')],
