@@ -4,6 +4,8 @@ import '../services/task_service.dart';
 import '../widgets/task_card.dart';
 import '../widgets/calendar_widget.dart';
 import '../services/notification_service.dart';
+import '../services/settings_service.dart';
+import 'settings_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,25 +16,40 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   TaskService? taskService;
-  int _currentIndex = 0; // 0 = To-Do, 1 = Calendrier
+  int _currentIndex = 0;
+  final _settings = SettingsService();
 
   @override
   void initState() {
     super.initState();
-    // initialize TaskService
+    _settings.addListener(_onSettingsChanged);
     TaskService.create().then((s) async {
       await s.rescheduleAllNotifications();
-      if (mounted) setState(() {
-        taskService = s;
-      });
+      if (mounted) {
+        setState(() {
+          taskService = s;
+        });
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _settings.removeListener(_onSettingsChanged);
+    super.dispose();
+  }
+
+  void _onSettingsChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+    final isFr = _settings.isFrench;
+    String t(String fr, String en) => isFr ? fr : en;
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -40,8 +57,8 @@ class _HomeScreenState extends State<HomeScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              colorScheme.primary.withOpacity(0.1),
-              colorScheme.secondary.withOpacity(0.1),
+              colorScheme.primary.withValues(alpha: 0.1),
+              colorScheme.secondary.withValues(alpha: 0.1),
             ],
           ),
         ),
@@ -81,12 +98,34 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                               Text(
-                                'Organisez votre journée',
+                                t('Organisez votre journée', 'Organize your day'),
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ],
+                          ),
+                        ),
+                        // Settings button
+                        Container(
+                          decoration: BoxDecoration(
+                            color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.settings_outlined,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            tooltip: t('Paramètres', 'Settings'),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const SettingsScreen(),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -99,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: colorScheme.shadow.withOpacity(0.1),
+                            color: colorScheme.shadow.withValues(alpha: 0.08),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -111,11 +150,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: GestureDetector(
                               onTap: () => setState(() => _currentIndex = 0),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: _currentIndex == 0 
-                                    ? colorScheme.primary 
-                                    : Colors.transparent,
+                                  color: _currentIndex == 0
+                                      ? colorScheme.primary
+                                      : Colors.transparent,
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: Row(
@@ -123,20 +164,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     Icon(
                                       Icons.list,
-                                      color: _currentIndex == 0 
-                                        ? colorScheme.onPrimary 
-                                        : colorScheme.onSurfaceVariant,
+                                      color: _currentIndex == 0
+                                          ? colorScheme.onPrimary
+                                          : colorScheme.onSurfaceVariant,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      'Tâches',
+                                      t('Tâches', 'Tasks'),
                                       style: TextStyle(
-                                        color: _currentIndex == 0 
-                                          ? colorScheme.onPrimary 
-                                          : colorScheme.onSurfaceVariant,
-                                        fontWeight: _currentIndex == 0 
-                                          ? FontWeight.bold 
-                                          : FontWeight.normal,
+                                        color: _currentIndex == 0
+                                            ? colorScheme.onPrimary
+                                            : colorScheme.onSurfaceVariant,
+                                        fontWeight: _currentIndex == 0
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
                                       ),
                                     ),
                                   ],
@@ -148,11 +189,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: GestureDetector(
                               onTap: () => setState(() => _currentIndex = 1),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: _currentIndex == 1 
-                                    ? colorScheme.primary 
-                                    : Colors.transparent,
+                                  color: _currentIndex == 1
+                                      ? colorScheme.primary
+                                      : Colors.transparent,
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: Row(
@@ -160,20 +203,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     Icon(
                                       Icons.calendar_today,
-                                      color: _currentIndex == 1 
-                                        ? colorScheme.onPrimary 
-                                        : colorScheme.onSurfaceVariant,
+                                      color: _currentIndex == 1
+                                          ? colorScheme.onPrimary
+                                          : colorScheme.onSurfaceVariant,
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      'Calendrier',
+                                      t('Calendrier', 'Calendar'),
                                       style: TextStyle(
-                                        color: _currentIndex == 1 
-                                          ? colorScheme.onPrimary 
-                                          : colorScheme.onSurfaceVariant,
-                                        fontWeight: _currentIndex == 1 
-                                          ? FontWeight.bold 
-                                          : FontWeight.normal,
+                                        color: _currentIndex == 1
+                                            ? colorScheme.onPrimary
+                                            : colorScheme.onSurfaceVariant,
+                                        fontWeight: _currentIndex == 1
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
                                       ),
                                     ),
                                   ],
@@ -190,25 +233,25 @@ class _HomeScreenState extends State<HomeScreen> {
               // Content
               Expanded(
                 child: taskService == null
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(
-                            color: colorScheme.primary,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Chargement...',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(
+                              color: colorScheme.primary,
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : _currentIndex == 0
-                    ? _buildTasksList(theme, colorScheme)
+                            const SizedBox(height: 16),
+                            Text(
+                              t('Chargement...', 'Loading...'),
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : _currentIndex == 0
+                    ? _buildTasksList(theme, colorScheme, isFr)
                     : CalendarWidget(
                         tasks: taskService!.tasks,
                         onDelete: _confirmDelete,
@@ -223,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: colorScheme.primary.withOpacity(0.3),
+              color: colorScheme.primary.withValues(alpha: 0.3),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -234,15 +277,16 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
           icon: const Icon(Icons.add),
-          label: const Text('Nouvelle tâche'),
+          label: Text(t('Nouvelle tâche', 'New task')),
         ),
       ),
     );
   }
 
-  Widget _buildTasksList(ThemeData theme, ColorScheme colorScheme) {
+  Widget _buildTasksList(ThemeData theme, ColorScheme colorScheme, bool isFr) {
     final tasks = taskService!.tasks;
-    
+    String t(String fr, String en) => isFr ? fr : en;
+
     if (tasks.isEmpty) {
       return Center(
         child: Column(
@@ -255,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: colorScheme.shadow.withOpacity(0.1),
+                    color: colorScheme.shadow.withValues(alpha: 0.08),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -269,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Aucune tâche',
+              t('Aucune tâche', 'No tasks'),
               style: theme.textTheme.headlineSmall?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w500,
@@ -277,9 +321,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Appuyez sur + pour ajouter votre première tâche',
+              t(
+                'Appuyez sur + pour ajouter votre première tâche',
+                'Tap + to add your first task',
+              ),
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurfaceVariant.withOpacity(0.7),
+                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -308,7 +355,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void _confirmDelete(Task task) async {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+    final isFr = _settings.isFrench;
+    String t(String fr, String en) => isFr ? fr : en;
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -318,17 +367,19 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(Icons.delete_outline, color: Colors.red[700]),
             ),
             const SizedBox(width: 12),
-            const Text('Supprimer la tâche'),
+            Text(t('Supprimer la tâche', 'Delete task')),
           ],
         ),
         content: Text(
-          'Êtes-vous sûr de vouloir supprimer "${task.title}" ?',
+          isFr
+              ? 'Êtes-vous sûr de vouloir supprimer "${task.title}" ?'
+              : 'Are you sure you want to delete "${task.title}"?',
           style: theme.textTheme.bodyMedium,
         ),
         actions: [
@@ -336,10 +387,12 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => Navigator.pop(context, false),
             style: TextButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: Text(
-              'Annuler',
+              t('Annuler', 'Cancel'),
               style: TextStyle(color: colorScheme.onSurfaceVariant),
             ),
           ),
@@ -349,15 +402,17 @@ class _HomeScreenState extends State<HomeScreen> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text('Supprimer'),
+            child: Text(t('Supprimer', 'Delete')),
           ),
         ],
       ),
     );
+
     if (confirmed == true && taskService != null) {
-      // cancel scheduled notifications for this task
       await NotificationService().cancelNotificationForTask(task);
       await taskService!.removeTask(task);
       setState(() {});
@@ -367,11 +422,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showAddTaskBottomSheet() async {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+    final isFr = _settings.isFrench;
+    String t(String fr, String en) => isFr ? fr : en;
+
     String title = '';
     DateTime startDate = DateTime.now();
-    DateTime deadline = DateTime.now().add(const Duration(days: 1));
-    int priority = 2; // 1=Urgent,2=Modéré,3=Faible
+    DateTime deadline = DateTime.now().add(const Duration(hours: 2));
+    int priority = 2; // 1=Urgent, 2=Moderate, 3=Low
 
     if (!mounted) return;
 
@@ -394,7 +451,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: colorScheme.onSurfaceVariant.withOpacity(0.4),
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -406,7 +463,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withOpacity(0.1),
+                        color: colorScheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Icon(
@@ -418,7 +475,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: Text(
-                        'Nouvelle tâche',
+                        t('Nouvelle tâche', 'New task'),
                         style: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -426,7 +483,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: Icon(Icons.close, color: colorScheme.onSurfaceVariant),
+                      icon: Icon(
+                        Icons.close,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -440,7 +500,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       // Title field
                       Text(
-                        'Titre',
+                        t('Titre', 'Title'),
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: colorScheme.onSurface,
@@ -449,9 +509,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 8),
                       TextField(
                         decoration: InputDecoration(
-                          hintText: 'Entrez le titre de la tâche',
+                          hintText: t('Entrez le titre de la tâche', 'Enter task title'),
                           filled: true,
-                          fillColor: colorScheme.surfaceVariant.withOpacity(0.3),
+                          fillColor: colorScheme.surfaceContainerHighest.withValues(
+                            alpha: 0.3,
+                          ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(16),
                             borderSide: BorderSide.none,
@@ -461,10 +523,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         onChanged: (value) => title = value,
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Dates section
                       Text(
-                        'Dates',
+                        t('Dates', 'Dates'),
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: colorScheme.onSurface,
@@ -477,14 +539,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: colorScheme.surfaceVariant.withOpacity(0.3),
+                                color: colorScheme.surfaceContainerHighest.withValues(
+                                  alpha: 0.3,
+                                ),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Début',
+                                    t('Début', 'Start'),
                                     style: theme.textTheme.labelSmall?.copyWith(
                                       color: colorScheme.onSurfaceVariant,
                                     ),
@@ -500,14 +564,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                       );
                                       if (picked != null) {
                                         setState(() {
-                                          startDate = DateTime(picked.year, picked.month, picked.day, startDate.hour, startDate.minute);
+                                          startDate = DateTime(
+                                            picked.year,
+                                            picked.month,
+                                            picked.day,
+                                            startDate.hour,
+                                            startDate.minute,
+                                          );
                                           if (deadline.isBefore(startDate)) {
-                                            deadline = startDate.add(const Duration(hours: 1));
+                                            deadline = startDate.add(
+                                              const Duration(hours: 1),
+                                            );
                                           }
                                         });
                                       }
                                     },
-                                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                    ),
                                     child: Text(
                                       startDate.toLocal().toString().split(' ')[0],
                                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -524,14 +598,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
-                                color: colorScheme.surfaceVariant.withOpacity(0.3),
+                                color: colorScheme.surfaceContainerHighest.withValues(
+                                  alpha: 0.3,
+                                ),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Deadline',
+                                    t('Deadline', 'Deadline'),
                                     style: theme.textTheme.labelSmall?.copyWith(
                                       color: colorScheme.onSurfaceVariant,
                                     ),
@@ -546,14 +622,29 @@ class _HomeScreenState extends State<HomeScreen> {
                                         lastDate: DateTime(2100),
                                       );
                                       if (picked != null) {
+                                        if (!context.mounted) return;
+                                        final pickedTime = await showTimePicker(
+                                          context: context,
+                                          initialTime: TimeOfDay.fromDateTime(
+                                            deadline,
+                                          ),
+                                        );
                                         setState(() {
-                                          deadline = DateTime(picked.year, picked.month, picked.day, deadline.hour, deadline.minute);
+                                          deadline = DateTime(
+                                            picked.year,
+                                            picked.month,
+                                            picked.day,
+                                            pickedTime?.hour ?? deadline.hour,
+                                            pickedTime?.minute ?? deadline.minute,
+                                          );
                                         });
                                       }
                                     },
-                                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
+                                    ),
                                     child: Text(
-                                      deadline.toLocal().toString().split(' ')[0],
+                                      '${deadline.toLocal().toString().split(' ')[0]} ${TimeOfDay.fromDateTime(deadline.toLocal()).format(context)}',
                                       style: theme.textTheme.bodyMedium?.copyWith(
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -566,10 +657,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Priority section
                       Text(
-                        'Priorité',
+                        t('Priorité', 'Priority'),
                         style: theme.textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: colorScheme.onSurface,
@@ -584,26 +675,34 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: priority == 1 
-                                    ? Colors.red.withOpacity(0.1) 
-                                    : colorScheme.surfaceVariant.withOpacity(0.3),
+                                  color: priority == 1
+                                      ? Colors.red.withValues(alpha: 0.1)
+                                      : colorScheme.surfaceContainerHighest.withValues(
+                                          alpha: 0.3,
+                                        ),
                                   borderRadius: BorderRadius.circular(16),
-                                  border: priority == 1 
-                                    ? Border.all(color: Colors.red, width: 2) 
-                                    : null,
+                                  border: priority == 1
+                                      ? Border.all(color: Colors.red, width: 2)
+                                      : null,
                                 ),
                                 child: Column(
                                   children: [
                                     Icon(
                                       Icons.priority_high,
-                                      color: priority == 1 ? Colors.red : colorScheme.onSurfaceVariant,
+                                      color: priority == 1
+                                          ? Colors.red
+                                          : colorScheme.onSurfaceVariant,
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Urgent',
+                                      t('Urgent', 'Urgent'),
                                       style: TextStyle(
-                                        color: priority == 1 ? Colors.red : colorScheme.onSurfaceVariant,
-                                        fontWeight: priority == 1 ? FontWeight.bold : FontWeight.normal,
+                                        color: priority == 1
+                                            ? Colors.red
+                                            : colorScheme.onSurfaceVariant,
+                                        fontWeight: priority == 1
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
                                       ),
                                     ),
                                   ],
@@ -618,26 +717,37 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: priority == 2 
-                                    ? Colors.orange.withOpacity(0.1) 
-                                    : colorScheme.surfaceVariant.withOpacity(0.3),
+                                  color: priority == 2
+                                      ? Colors.orange.withValues(alpha: 0.1)
+                                      : colorScheme.surfaceContainerHighest.withValues(
+                                          alpha: 0.3,
+                                        ),
                                   borderRadius: BorderRadius.circular(16),
-                                  border: priority == 2 
-                                    ? Border.all(color: Colors.orange, width: 2) 
-                                    : null,
+                                  border: priority == 2
+                                      ? Border.all(
+                                          color: Colors.orange,
+                                          width: 2,
+                                        )
+                                      : null,
                                 ),
                                 child: Column(
                                   children: [
                                     Icon(
                                       Icons.schedule,
-                                      color: priority == 2 ? Colors.orange : colorScheme.onSurfaceVariant,
+                                      color: priority == 2
+                                          ? Colors.orange
+                                          : colorScheme.onSurfaceVariant,
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Modéré',
+                                      t('Modéré', 'Moderate'),
                                       style: TextStyle(
-                                        color: priority == 2 ? Colors.orange : colorScheme.onSurfaceVariant,
-                                        fontWeight: priority == 2 ? FontWeight.bold : FontWeight.normal,
+                                        color: priority == 2
+                                            ? Colors.orange
+                                            : colorScheme.onSurfaceVariant,
+                                        fontWeight: priority == 2
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
                                       ),
                                     ),
                                   ],
@@ -652,26 +762,37 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: priority == 3 
-                                    ? Colors.green.withOpacity(0.1) 
-                                    : colorScheme.surfaceVariant.withOpacity(0.3),
+                                  color: priority == 3
+                                      ? Colors.green.withValues(alpha: 0.1)
+                                      : colorScheme.surfaceContainerHighest.withValues(
+                                          alpha: 0.3,
+                                        ),
                                   borderRadius: BorderRadius.circular(16),
-                                  border: priority == 3 
-                                    ? Border.all(color: Colors.green, width: 2) 
-                                    : null,
+                                  border: priority == 3
+                                      ? Border.all(
+                                          color: Colors.green,
+                                          width: 2,
+                                        )
+                                      : null,
                                 ),
                                 child: Column(
                                   children: [
                                     Icon(
                                       Icons.low_priority,
-                                      color: priority == 3 ? Colors.green : colorScheme.onSurfaceVariant,
+                                      color: priority == 3
+                                          ? Colors.green
+                                          : colorScheme.onSurfaceVariant,
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Faible',
+                                      t('Faible', 'Low'),
                                       style: TextStyle(
-                                        color: priority == 3 ? Colors.green : colorScheme.onSurfaceVariant,
-                                        fontWeight: priority == 3 ? FontWeight.bold : FontWeight.normal,
+                                        color: priority == 3
+                                            ? Colors.green
+                                            : colorScheme.onSurfaceVariant,
+                                        fontWeight: priority == 3
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
                                       ),
                                     ),
                                   ],
@@ -693,7 +814,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: colorScheme.surface,
                   border: Border(
                     top: BorderSide(
-                      color: colorScheme.outline.withOpacity(0.2),
+                      color: colorScheme.outline.withValues(alpha: 0.2),
                     ),
                   ),
                 ),
@@ -704,10 +825,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () => Navigator.pop(context),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
                         child: Text(
-                          'Annuler',
+                          t('Annuler', 'Cancel'),
                           style: TextStyle(
                             color: colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,
@@ -719,24 +842,31 @@ class _HomeScreenState extends State<HomeScreen> {
                     Expanded(
                       flex: 2,
                       child: ElevatedButton(
-                        onPressed: title.trim().isEmpty ? null : () {
-                          Navigator.pop(context, Task(
-                            title: title.trim(),
-                            startDate: startDate,
-                            deadline: deadline,
-                            priority: priority,
-                          ));
-                        },
+                        onPressed: title.trim().isEmpty
+                            ? null
+                            : () {
+                                Navigator.pop(
+                                  context,
+                                  Task(
+                                    title: title.trim(),
+                                    startDate: startDate,
+                                    deadline: deadline,
+                                    priority: priority,
+                                  ),
+                                );
+                              },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colorScheme.primary,
                           foregroundColor: colorScheme.onPrimary,
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                           elevation: 0,
                         ),
-                        child: const Text(
-                          'Créer la tâche',
-                          style: TextStyle(fontWeight: FontWeight.w600),
+                        child: Text(
+                          t('Créer la tâche', 'Create task'),
+                          style: const TextStyle(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
@@ -748,12 +878,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
-    
+
     if (newTask != null && taskService != null) {
       await taskService!.addTask(newTask);
-      // show immediate notification and schedule reminder
-      await NotificationService().showNewTaskNotification(newTask);
-      await NotificationService().scheduleDeadlineReminder(newTask);
       setState(() {});
     }
   }

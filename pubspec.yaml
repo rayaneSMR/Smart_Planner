@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   google_sign_in: ^6.0.3       # Connexion Google
   googleapis: ^14.0.0          # API Google Calendar
   http: ^1.2.0                 # Pour les requêtes HTTP
@@ -39,6 +41,7 @@ dependencies:
   timezone: ^0.10.1
   flutter_native_timezone_latest: ^1.0.0
   table_calendar: ^3.0.9
+  shared_preferences: ^2.3.0   # Persistance des paramètres
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

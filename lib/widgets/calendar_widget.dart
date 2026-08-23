@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../models/task.dart';
+import '../services/settings_service.dart';
 import 'task_card.dart';
 
 bool isSameDay(DateTime? a, DateTime? b) {
@@ -12,8 +13,11 @@ class CalendarWidget extends StatefulWidget {
   final List<Task> tasks;
   final Function(Task) onDelete;
 
-  const CalendarWidget(
-      {super.key, required this.tasks, required this.onDelete});
+  const CalendarWidget({
+    super.key,
+    required this.tasks,
+    required this.onDelete,
+  });
 
   @override
   State<CalendarWidget> createState() => _CalendarWidgetState();
@@ -31,29 +35,24 @@ class _CalendarWidgetState extends State<CalendarWidget> {
     }).toList();
   }
 
-  String _getTaskCountText(DateTime day) {
-    final tasksForDay = _getTasksForDay(day);
-    return ''; // Plus d'affichage du nombre de tâches
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final tasks =
-        _selectedDay == null ? [] : _getTasksForDay(_selectedDay!);
+    final isFr = SettingsService().isFrench;
+    final tasks = _selectedDay == null ? [] : _getTasksForDay(_selectedDay!);
 
     return Column(
       children: [
         Container(
-          margin: const EdgeInsets.all(30),
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: colorScheme.shadow.withOpacity(0.08),
+                color: colorScheme.shadow.withValues(alpha: 0.08),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -63,6 +62,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             firstDay: DateTime.utc(2020),
             lastDay: DateTime.utc(2100),
             focusedDay: _focusedDay,
+            locale: isFr ? 'fr_FR' : 'en_US',
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
@@ -86,7 +86,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 color: colorScheme.primary,
                 fontWeight: FontWeight.bold,
               ) ?? const TextStyle(),
-              defaultDecoration: BoxDecoration(
+              defaultDecoration: const BoxDecoration(
                 color: Colors.transparent,
                 shape: BoxShape.circle,
               ),
@@ -95,7 +95,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 shape: BoxShape.circle,
               ),
               todayDecoration: BoxDecoration(
-                color: colorScheme.primary.withOpacity(0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
                 border: Border.all(color: colorScheme.primary, width: 1),
               ),
@@ -128,12 +128,10 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             ),
             calendarBuilders: CalendarBuilders(
               defaultBuilder: (context, day, focusedDay) {
-                final taskCountText = _getTaskCountText(day);
-                final hasTasks = taskCountText.isNotEmpty;
-                
                 return Container(
                   margin: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
                     color: Colors.transparent,
                     shape: BoxShape.circle,
                   ),
@@ -141,7 +139,6 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                     '${day.day}',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurface,
-                      fontWeight: hasTasks ? FontWeight.bold : FontWeight.normal,
                     ) ?? const TextStyle(),
                   ),
                 );
@@ -149,6 +146,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               selectedBuilder: (context, day, focusedDay) {
                 return Container(
                   margin: const EdgeInsets.all(4),
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: colorScheme.primary,
                     shape: BoxShape.circle,
@@ -163,13 +161,11 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                 );
               },
               todayBuilder: (context, day, focusedDay) {
-                final taskCountText = _getTaskCountText(day);
-                final hasTasks = taskCountText.isNotEmpty;
-                
                 return Container(
                   margin: const EdgeInsets.all(4),
+                  alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: colorScheme.primary.withOpacity(0.1),
+                    color: colorScheme.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                     border: Border.all(color: colorScheme.primary, width: 1),
                   ),
@@ -185,7 +181,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             ),
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         Expanded(
           child: tasks.isEmpty
               ? Center(
@@ -195,7 +191,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                       Container(
                         padding: const EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: colorScheme.surfaceVariant.withOpacity(0.3),
+                          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -206,7 +202,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        "Aucune tâche pour ce jour",
+                        isFr ? "Aucune tâche pour ce jour" : "No tasks for this day",
                         style: theme.textTheme.bodyLarge?.copyWith(
                           color: colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w500,
