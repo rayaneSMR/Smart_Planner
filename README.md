@@ -182,7 +182,7 @@ Ce projet est sous licence **MIT** - libre d'utilisation, modification et distri
 
 ---
 
-**Développé avec ❤️ en Flutter**  
+**Développé avec ❤️ par Rayane**  
 **Architecturé pour évoluer** • **Conçu pour durer**
 
 *Pour toute question ou suggestion : [rayaneSMR](https://github.com/rayaneSMR)*
